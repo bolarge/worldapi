@@ -1,0 +1,20 @@
+version: "3.7"
+services:
+  mysql:
+    image: mysql:5.7.41
+    environment:
+      MYSQL_PASSWORD: test
+    expose:
+      - "3306"
+  card-manager:
+    image: docker.dotbank.africa/card-request-generator:${TAG}
+    ports:
+      - "8585:8585"
+    environment:
+      CARD_MANAGER_DB_USER: cardmanager
+      CARD_MANAGER_DB_PASSWORD: cardmanager
+      CARD_MANAGER_DB_DRIVER: com.mysql.cj.jdbc.Driver
+      CARD_MANAGER_DB_URL: jdbc:mysql://localhost:3306/cards_db?serverTimezone=UTC&useSSL=false
+      CARD_MANAGER_DB_DIALECT: org.hibernate.dialect.MySQL8Dialect
+    depends_on:
+      - card-manager
