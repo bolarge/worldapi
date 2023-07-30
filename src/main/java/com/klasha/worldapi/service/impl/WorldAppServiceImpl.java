@@ -7,8 +7,11 @@ import com.klasha.worldapi.model.Country;
 import com.klasha.worldapi.service.WorldAppService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class WorldAppServiceImpl implements WorldAppService {
@@ -17,16 +20,18 @@ public class WorldAppServiceImpl implements WorldAppService {
 
     @Override
     public Country create(Country country) {
-        return null;
+        return countryRepository.save(country);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Country> fetchAll() {
-        return null;
+        return countryRepository.findAll();
     }
 
     @Override
-    public GenericResponse<CountryResourceResponse> findCountry(String countryName) {
+    @Transactional(readOnly = true)
+    public GenericResponse<CountryResourceResponse> findCountryByName(String countryName) {
         Country country = countryRepository.findCountryByName(countryName);
         CountryResourceResponse resourceResponse = CountryResourceResponse.builder().name(country.getName())
                 .countryCapital(country.getCountryCapital())
@@ -39,5 +44,11 @@ public class WorldAppServiceImpl implements WorldAppService {
         response.setMessage("Successfully retrieved details for %s");
         response.setData(resourceResponse);
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Country> findById(Integer id) {
+        return countryRepository.findById(id);
     }
 }

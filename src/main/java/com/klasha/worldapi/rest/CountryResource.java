@@ -22,7 +22,7 @@ public class CountryResource {
     }
     @GetMapping("/countries/{countryName}")
     public ResponseEntity<?> getCountry(@PathVariable("countryName") String countryName){
-        GenericResponse<CountryResourceResponse> queryResponse = worldAppService.findCountry(countryName);
+        GenericResponse<CountryResourceResponse> queryResponse = worldAppService.findCountryByName(countryName);
         return ResponseEntity.ok(queryResponse);
     }
 
