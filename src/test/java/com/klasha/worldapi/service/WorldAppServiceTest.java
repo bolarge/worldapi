@@ -1,4 +1,4 @@
-package com.klasha.worldapi.rest;
+package com.klasha.worldapi.service;
 
 import com.klasha.worldapi.dataccess.CountryRepository;
 import com.klasha.worldapi.model.Country;
