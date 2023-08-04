@@ -1,9 +1,15 @@
 country:
   - id: 1
-    name: "Widget 1"
-    description: "This is widget 1"
-    version: 1
+    name: "Nigeria"
+    location: "100-211"
+    population: "2000000"
+    countryCapital: "Abuja"
+    isoCode2: "NG"
+    isoCode3: "NGN"
   - id: 2
-    name: "Widget 2"
-    description: "This is widget 2"
-    version: 7
+    name: "Canada"
+    location: "180-229"
+    population: "8000000"
+    countryCapital: "Ottawa"
+    isoCode2: "CD"
+    isoCode3: "CND"

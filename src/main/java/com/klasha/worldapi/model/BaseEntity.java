@@ -1,20 +1,14 @@
 package com.klasha.worldapi.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Objects;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
 @MappedSuperclass
 public class BaseEntity implements Serializable {
 
@@ -24,18 +18,27 @@ public class BaseEntity implements Serializable {
   @GenericGenerator(name = "native", strategy = "native")
   protected Integer id;
 
-  @Column(name = "date_created", updatable = false)
-  @DateTimeFormat(pattern = "dd/MM/yyyy")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-  protected LocalDate dateCreated = LocalDate.now();
-
-  @Column(name = "date_updated")
-  @DateTimeFormat(pattern = "dd/MM/yyyy")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-  protected LocalDate dateUpdated = LocalDate.now();
-
-  public BaseEntity(Integer id, LocalDate dateCreated) {
+  public BaseEntity(Integer id) {
     this.id = id;
-    this.dateCreated = dateCreated;
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof BaseEntity that)) return false;
+    return Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId());
   }
 }

@@ -1,7 +1,7 @@
 package com.klasha.worldapi.rest;
 
 import com.klasha.worldapi.model.Country;
-import com.klasha.worldapi.service.WorldAppService;
+import com.klasha.worldapi.service.WorldApiService;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,10 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import java.time.LocalDate;
-
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.ArgumentMatchers.any;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +25,7 @@ import static org.hamcrest.Matchers.*;
 public class WorldAppRestControllerTest {
 
     @MockBean
-    private WorldAppService service;
+    private WorldApiService service;
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,11 +34,11 @@ public class WorldAppRestControllerTest {
     @DisplayName("GET /countries success")
     void testGetCountriesSuccess() throws Exception {
         // Setup our mocked service
-        Country country1 = new Country(1, LocalDate.now(),"Nigeria","100-211",
-                "2000000","400 sqm",  "Abuja", "NG", "NGN");
-        Country country2 = new Country(2,LocalDate.now(),"Canada","180-229",
-                "8000000","700 sqm",  "Ottawa", "CN", "CND");
-        doReturn(Lists.newArrayList(country1, country2)).when(service).fetchAll();
+        Country country1 = new Country(1,"Nigeria","100-211",
+                2000000,  "Abuja", "NG", "NGN");
+        Country country2 = new Country(2,"Canada","180-229",
+                8000000,  "Ottawa", "CN", "CND");
+        doReturn(Lists.newArrayList(country1, country2)).when(service).fetchAllCountries();
 
         // Execute the GET request
         mockMvc.perform(get("/api/v1/countries"))
