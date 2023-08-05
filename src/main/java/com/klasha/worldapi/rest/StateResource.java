@@ -31,7 +31,7 @@ public class StateResource {
         return ResponseEntity.ok(requestResponse);
     }
 
-    @PutMapping("/state/{stateId}")
+    @PutMapping("/state/{stateId}/city")
     public ResponseEntity<?> addCityToState(@PathVariable("stateId") Integer stateId, CityRecord cityRecord){
         var requestResponse = worldApiService.addCityToState(stateId, cityRecord);
         return ResponseEntity.ok(requestResponse);

@@ -6,6 +6,7 @@ import com.klasha.worldapi.dataccess.StateRepository;
 import com.klasha.worldapi.datatransfer.*;
 import com.klasha.worldapi.model.City;
 import com.klasha.worldapi.model.Country;
+import com.klasha.worldapi.model.ExchangeRate;
 import com.klasha.worldapi.model.State;
 import com.klasha.worldapi.service.WorldApiService;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -136,7 +138,7 @@ public class WorldApiServiceImpl implements WorldApiService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Country> findById(Integer id) {
-        return countryRepository.findById(id);
+        return getById(id);
     }
 
     @Override
@@ -148,6 +150,7 @@ public class WorldApiServiceImpl implements WorldApiService {
         newCountry.setName(countryRecord.countryName());
         newCountry.setLocation(countryRecord.countryLocation());
         newCountry.setPopulation(Integer.parseInt(countryRecord.countryPopulation()));
+        newCountry.setCurrencyCode(countryRecord.currencyCode());
 
         var newState = new State();
         newState.setName(countryRecord.stateName());
@@ -162,7 +165,7 @@ public class WorldApiServiceImpl implements WorldApiService {
         GenericResponse<CountryRecord> requestResponse = new GenericResponse<>();
         CountryRecord cRec = new CountryRecord(newCountry.getIsoCode2(), newCountry.getIsoCode3(),newCountry.getName(),
                 newCountry.getLocation(), String.valueOf(newCountry.getPopulation()), newCountry.getCountryCapital(), newState.getStateCode(),
-                newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), "");
+                newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), newCountry.getCurrencyCode(), "");
         requestResponse.setData(cRec);
         requestResponse.setMessage("Country " +countryRecord.countryName() +" was created successfully");
         return requestResponse;
@@ -171,7 +174,7 @@ public class WorldApiServiceImpl implements WorldApiService {
     @Override
     @Transactional(readOnly = true)
     public GenericResponse<LocalityResourceResponse> getCountryDetails(String countryName) {
-        var country = countryRepository.findCountryByName(countryName);
+        var country = getCountryByName(countryName);
         LocalityResourceResponse resourceResponse = LocalityResourceResponse.builder().name(country.getName())
                 .countryCapital(country.getCountryCapital())
                 .location(country.getLocation())
@@ -188,7 +191,7 @@ public class WorldApiServiceImpl implements WorldApiService {
     @Override
     @Transactional(readOnly = true)
     public GenericResponse<LocalityResourceResponse> getCountryFullDetails(String countryName) {
-        var country = countryRepository.findCountryByName(countryName);
+        var country = getCountryByName(countryName);
         LocalityResourceResponse resourceResponse = LocalityResourceResponse.builder().name(country.getName())
                 .countryCapital(country.getCountryCapital())
                 .location(country.getLocation())
@@ -205,7 +208,7 @@ public class WorldApiServiceImpl implements WorldApiService {
 
     @Override
     public GenericResponse<CountryRecord> addStateToCountry(Integer countryId, StateRecord stateRecord) {
-        var queriedCountry = countryRepository.findById(countryId);
+        var queriedCountry = getById(countryId);
         var foundCountry = queriedCountry.orElseGet(queriedCountry::orElseThrow);
 
         var newState = new State();
@@ -221,11 +224,36 @@ public class WorldApiServiceImpl implements WorldApiService {
         var requestResponse = new GenericResponse<CountryRecord>();
         CountryRecord cRec = new CountryRecord(foundCountry.getIsoCode2(), foundCountry.getIsoCode3(),foundCountry.getName(),
                 foundCountry.getLocation(), String.valueOf(foundCountry.getPopulation()), foundCountry.getCountryCapital(), newState.getStateCode(),
-                newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), "");
+                newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), foundCountry.getCurrencyCode(), "");
         requestResponse.setData(cRec);
         requestResponse.setMessage("State " +stateRecord.stateName() +" was successfully added to Country " + foundCountry.getName());
         return requestResponse;
+    }
 
+    public GenericResponse<ExchangeRateRecord> addCurrencyToCountry(Integer countryId, ExchangeRateRecord exchangeRateRecord){
+        var queriedCountry = getById(countryId);
+        var foundCountry = queriedCountry.orElseGet(queriedCountry::orElseThrow);
+
+        var exchangeRate = new ExchangeRate(exchangeRateRecord.sourceCurrency(),exchangeRateRecord.targetCurrency(),
+                new BigDecimal(exchangeRateRecord.rate()));
+
+        foundCountry.addExchangeRate(exchangeRate);
+        foundCountry = countryRepository.save(foundCountry);
+
+        var requestResponse = new GenericResponse<ExchangeRateRecord>();
+        var rateRecorde = new ExchangeRateRecord(exchangeRateRecord.sourceCurrency(), exchangeRateRecord.targetCurrency(),
+                exchangeRateRecord.rate(), foundCountry.getName());
+        requestResponse.setData(rateRecorde);
+        requestResponse.setMessage("Exchange rate successfully for " + foundCountry.getName());
+        return  requestResponse;
+    }
+
+    private Optional<Country> getById(Integer countryId) {
+        return countryRepository.findById(countryId);
+    }
+
+    private Country getCountryByName(String countryName) {
+        return countryRepository.findCountryByName(countryName);
     }
 
     @Override
@@ -237,4 +265,29 @@ public class WorldApiServiceImpl implements WorldApiService {
         return queryResponse;
     }
 
+    @Override
+    public GenericResponse<ConvertedAmountRecord> convertSourceToTargetCurrency(String sourceCountry, String amount, String targetCurrency) {
+        var senderCountry = getCountryByName(sourceCountry);
+        var receiverCountry = countryRepository.findCountryByCurrencyCode(targetCurrency);
+
+        final Optional<ExchangeRate> exchangeRate = receiverCountry.getExchangeRates().stream().filter(
+                exchangeRate1 -> exchangeRate1.getSourceCurrency()
+                .equals(senderCountry.getCurrencyCode())).findFirst();
+
+        var selectedRate = exchangeRate.orElseGet(exchangeRate::orElseThrow);
+        var rateConvertedAmount = new BigDecimal(amount).multiply(selectedRate.getRate());
+        var locale = new Locale("en", receiverCountry.getIsoCode2());
+        var numberFormat = NumberFormat.getCurrencyInstance(locale);
+        var formattedAmount = numberFormat.format(rateConvertedAmount);
+
+        var requestResponse = new GenericResponse<ConvertedAmountRecord>();
+        var convertedAmountRecord = new ConvertedAmountRecord(selectedRate.getTargetCurrency(), formattedAmount);
+        requestResponse.setData(convertedAmountRecord);
+        requestResponse.setMessage(String.format("Conversion from %s to %s was successful for %s ", targetCurrency,
+                selectedRate.getSourceCurrency(), amount));
+
+        return requestResponse;
+    }
+
 }
+

@@ -14,5 +14,6 @@ public record CountryRecord(@NotBlank @NotNull @Size(min = 2, max = 2, message =
                             @NotBlank @NotNull @Size(min = 5, max = 25, message = "State name is required!") String stateName,
                             @NotBlank @NotNull @Size(message = "Location is required!") String stateLocation,
                             @NotBlank @NotNull @Size(message = "Population is required!") String statePopulation,
+                            @NotBlank @NotNull @Size(message = "Currency code is required!")String currencyCode,
                             String id) {
 }

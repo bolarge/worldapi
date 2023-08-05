@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
@@ -23,9 +21,14 @@ public class Country extends Locality {
     private String isoCode2;
     @Column(name = "code3")
     private String isoCode3;
+    @Column(unique = true)
+    private String currencyCode;
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<State> theStates = new HashSet<>();
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true )
+    private List<ExchangeRate> exchangeRates = new ArrayList<>();
 
     public Country(Integer id, String name, String location, int population, String countryCapital, String isoCode2, String isoCode3) {
         super(name, location, population);
@@ -46,6 +49,11 @@ public class Country extends Locality {
     public void addStates(Set<State> states) {
         ((State) states).setCountry(this);
         getTheStates().addAll(states);
+    }
+
+    public void addExchangeRate(ExchangeRate exchangeRate){
+        exchangeRate.setCountry(this);
+        exchangeRates.add(exchangeRate);
     }
 
     @Override

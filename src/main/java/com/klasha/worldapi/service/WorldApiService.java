@@ -30,4 +30,6 @@ public interface WorldApiService {
     GenericResponse<LocalityResourceResponse> getCountryDetails(String countryName);
     GenericResponse<LocalityResourceResponse> getCountryFullDetails(String countryName);
     GenericResponse<Iterable<Country>> getTopCitiesByPopulation(String limit);
+    GenericResponse<ExchangeRateRecord> addCurrencyToCountry(Integer countryId, ExchangeRateRecord exchangeRateRecord);
+    GenericResponse<ConvertedAmountRecord> convertSourceToTargetCurrency(String sourceCountry, String amount, String targetCurrency);
 }

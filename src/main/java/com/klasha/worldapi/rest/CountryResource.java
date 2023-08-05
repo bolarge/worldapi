@@ -1,6 +1,7 @@
 package com.klasha.worldapi.rest;
 
 import com.klasha.worldapi.datatransfer.CountryRecord;
+import com.klasha.worldapi.datatransfer.ExchangeRateRecord;
 import com.klasha.worldapi.datatransfer.GenericResponse;
 import com.klasha.worldapi.datatransfer.StateRecord;
 import com.klasha.worldapi.service.WorldApiService;
@@ -50,9 +51,22 @@ public class CountryResource {
         return ResponseEntity.ok(requestResponse);
     }
 
-    @PutMapping("/countries/{countryId}/add-state")
-    public ResponseEntity<?> addStateToCountryRecord( @PathVariable("countryId") Integer countryId, @Valid @RequestBody StateRecord stateRecord){
+    @PutMapping("/countries/{countryId}/state")
+    public ResponseEntity<?> addStateToCountryRecord(@PathVariable("countryId") Integer countryId, @Valid @RequestBody StateRecord stateRecord){
         var requestResponse = worldApiService.addStateToCountry(countryId, stateRecord);
+        return ResponseEntity.ok(requestResponse);
+    }
+
+    @PutMapping("/countries/{countryId}/currency")
+    public ResponseEntity<?> addCurrencyToCountry(@PathVariable("countryId") String countryId, ExchangeRateRecord exchangeRateRecord){
+        var requestResponse = worldApiService.addCurrencyToCountry(Integer.valueOf(countryId), exchangeRateRecord);
+        return  ResponseEntity.ok(requestResponse);
+    }
+
+    @GetMapping("/countries/{countryName}/currencies/{targetCurrency}/amount/{amount}")
+    public ResponseEntity<?> convertSourceToTargetCurrency(@PathVariable("countryName") String countryName, @PathVariable("amount") String amount,
+                                                           @PathVariable("targetCurrency") String targetCurrency){
+        var requestResponse = worldApiService.convertSourceToTargetCurrency(countryName, amount, targetCurrency);
         return ResponseEntity.ok(requestResponse);
     }
 
