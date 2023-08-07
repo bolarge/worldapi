@@ -60,7 +60,7 @@ To view specs, visit http://localhost:8585/worldapi/swagger-ui/index.html#/
 
 ##### Run Docker login
 ```bash
-    docker login -u <nexus.username> docker.dotbank.africa
+    docker login -u <username> docker
 ```
 
 ##### Spawn up the containers

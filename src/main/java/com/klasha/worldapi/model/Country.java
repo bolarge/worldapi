@@ -16,12 +16,11 @@ import java.util.*;
 @Entity
 public class Country extends Locality {
     @Column(name = "capital_city")
-    private String countryCapital;
+    private String capitalCity;
     @Column(name = "code2")
     private String isoCode2;
     @Column(name = "code3")
     private String isoCode3;
-    @Column(unique = true)
     private String currencyCode;
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "country", fetch = FetchType.LAZY, orphanRemoval = true)
@@ -32,7 +31,7 @@ public class Country extends Locality {
 
     public Country(Integer id, String name, String location, int population, String countryCapital, String isoCode2, String isoCode3) {
         super(name, location, population);
-        this.countryCapital = countryCapital;
+        this.capitalCity = countryCapital;
         this.isoCode2 = isoCode2;
         this.isoCode3 = isoCode3;
     }
@@ -62,11 +61,11 @@ public class Country extends Locality {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Country country = (Country) o;
-        return Objects.equals(getCountryCapital(), country.getCountryCapital()) && Objects.equals(getIsoCode3(), country.getIsoCode3());
+        return Objects.equals(getCapitalCity(), country.getCapitalCity()) && Objects.equals(getIsoCode3(), country.getIsoCode3());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getCountryCapital(), getIsoCode3());
+        return Objects.hash(super.hashCode(), getCapitalCity(), getIsoCode3());
     }
 }

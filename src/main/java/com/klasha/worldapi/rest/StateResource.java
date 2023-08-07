@@ -25,13 +25,13 @@ public class StateResource {
         return ResponseEntity.ok(requestResponse);
     }
 
-    @GetMapping("/states/name/{stateName}")
+    @GetMapping("/states/state/{stateName}")
     public ResponseEntity<?> getAStateDetails(@PathVariable("stateName") String stateName){
         var requestResponse = worldApiService.getStateByName(stateName);
         return ResponseEntity.ok(requestResponse);
     }
 
-    @PutMapping("/state/{stateId}/city")
+    @PutMapping("/states/{stateId}/city")
     public ResponseEntity<?> addCityToState(@PathVariable("stateId") Integer stateId, CityRecord cityRecord){
         var requestResponse = worldApiService.addCityToState(stateId, cityRecord);
         return ResponseEntity.ok(requestResponse);

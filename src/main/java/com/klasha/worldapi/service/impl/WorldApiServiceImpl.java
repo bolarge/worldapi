@@ -146,7 +146,7 @@ public class WorldApiServiceImpl implements WorldApiService {
         var newCountry = new Country();
         newCountry.setIsoCode2(countryRecord.isoCode2());
         newCountry.setIsoCode3(countryRecord.isoCode3());
-        newCountry.setCountryCapital(countryRecord.countryCapital());
+        newCountry.setCapitalCity(countryRecord.countryCapital());
         newCountry.setName(countryRecord.countryName());
         newCountry.setLocation(countryRecord.countryLocation());
         newCountry.setPopulation(Integer.parseInt(countryRecord.countryPopulation()));
@@ -164,7 +164,7 @@ public class WorldApiServiceImpl implements WorldApiService {
 
         GenericResponse<CountryRecord> requestResponse = new GenericResponse<>();
         CountryRecord cRec = new CountryRecord(newCountry.getIsoCode2(), newCountry.getIsoCode3(),newCountry.getName(),
-                newCountry.getLocation(), String.valueOf(newCountry.getPopulation()), newCountry.getCountryCapital(), newState.getStateCode(),
+                newCountry.getLocation(), String.valueOf(newCountry.getPopulation()), newCountry.getCapitalCity(), newState.getStateCode(),
                 newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), newCountry.getCurrencyCode(), "");
         requestResponse.setData(cRec);
         requestResponse.setMessage("Country " +countryRecord.countryName() +" was created successfully");
@@ -176,7 +176,7 @@ public class WorldApiServiceImpl implements WorldApiService {
     public GenericResponse<LocalityResourceResponse> getCountryDetails(String countryName) {
         var country = getCountryByName(countryName);
         LocalityResourceResponse resourceResponse = LocalityResourceResponse.builder().name(country.getName())
-                .countryCapital(country.getCountryCapital())
+                .countryCapital(country.getCapitalCity())
                 .location(country.getLocation())
                 .population(String.valueOf(country.getPopulation()))
                 .isoCode2(country.getIsoCode2())
@@ -193,7 +193,7 @@ public class WorldApiServiceImpl implements WorldApiService {
     public GenericResponse<LocalityResourceResponse> getCountryFullDetails(String countryName) {
         var country = getCountryByName(countryName);
         LocalityResourceResponse resourceResponse = LocalityResourceResponse.builder().name(country.getName())
-                .countryCapital(country.getCountryCapital())
+                .countryCapital(country.getCapitalCity())
                 .location(country.getLocation())
                 .population(String.valueOf(country.getPopulation()))
                 .isoCode2(country.getIsoCode2())
@@ -223,7 +223,7 @@ public class WorldApiServiceImpl implements WorldApiService {
 
         var requestResponse = new GenericResponse<CountryRecord>();
         CountryRecord cRec = new CountryRecord(foundCountry.getIsoCode2(), foundCountry.getIsoCode3(),foundCountry.getName(),
-                foundCountry.getLocation(), String.valueOf(foundCountry.getPopulation()), foundCountry.getCountryCapital(), newState.getStateCode(),
+                foundCountry.getLocation(), String.valueOf(foundCountry.getPopulation()), foundCountry.getCapitalCity(), newState.getStateCode(),
                 newState.getStateCapital(), newState.getLocation(), String.valueOf(newState.getPopulation()), foundCountry.getCurrencyCode(), "");
         requestResponse.setData(cRec);
         requestResponse.setMessage("State " +stateRecord.stateName() +" was successfully added to Country " + foundCountry.getName());
@@ -269,10 +269,11 @@ public class WorldApiServiceImpl implements WorldApiService {
     public GenericResponse<ConvertedAmountRecord> convertSourceToTargetCurrency(String sourceCountry, String amount, String targetCurrency) {
         var senderCountry = getCountryByName(sourceCountry);
         var receiverCountry = countryRepository.findCountryByCurrencyCode(targetCurrency);
-
+        log.info("Size is "+receiverCountry.getExchangeRates().size());
         final Optional<ExchangeRate> exchangeRate = receiverCountry.getExchangeRates().stream().filter(
-                exchangeRate1 -> exchangeRate1.getSourceCurrency()
-                .equals(senderCountry.getCurrencyCode())).findFirst();
+                exchangeRate1 -> senderCountry.getCurrencyCode()
+                .equals(exchangeRate1.getSourceCurrency())).findFirst();
+        log.info(String.valueOf(exchangeRate.isPresent()));
 
         var selectedRate = exchangeRate.orElseGet(exchangeRate::orElseThrow);
         var rateConvertedAmount = new BigDecimal(amount).multiply(selectedRate.getRate());

@@ -20,7 +20,7 @@
 		<springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
 		<jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
 		<spotless.version>2.22.8</spotless.version>
-		<springboot.version>3.0.4</springboot.version>
+		<springboot.version>3.1.2</springboot.version>
 
 		<!-- Maven plugins -->
 		<jacoco.version>0.8.8</jacoco.version>

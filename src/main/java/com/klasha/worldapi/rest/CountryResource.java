@@ -57,13 +57,13 @@ public class CountryResource {
         return ResponseEntity.ok(requestResponse);
     }
 
-    @PutMapping("/countries/{countryId}/currency")
+    @PutMapping("/countries/{countryId}/exchange-rate")
     public ResponseEntity<?> addCurrencyToCountry(@PathVariable("countryId") String countryId, ExchangeRateRecord exchangeRateRecord){
         var requestResponse = worldApiService.addCurrencyToCountry(Integer.valueOf(countryId), exchangeRateRecord);
         return  ResponseEntity.ok(requestResponse);
     }
 
-    @GetMapping("/countries/{countryName}/currencies/{targetCurrency}/amount/{amount}")
+    @GetMapping("/countries/{countryName}/exchange-rate/{targetCurrency}/amount/{amount}")
     public ResponseEntity<?> convertSourceToTargetCurrency(@PathVariable("countryName") String countryName, @PathVariable("amount") String amount,
                                                            @PathVariable("targetCurrency") String targetCurrency){
         var requestResponse = worldApiService.convertSourceToTargetCurrency(countryName, amount, targetCurrency);

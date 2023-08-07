@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @Tag(name = "Cities", description = "City Resource")
 @RequiredArgsConstructor
-@RequestMapping(value = "api/v1")
+@RequestMapping(value = "v1")
 @RestController
 public class CityResource {
 
@@ -24,7 +24,6 @@ public class CityResource {
     public ResponseEntity<?> addCityRecord(@Valid @RequestBody CityRecord cityRecord){
         var requestResponse = worldApiService.createCity(cityRecord);
         return ResponseEntity.ok(requestResponse);
-
     }
 
 }
